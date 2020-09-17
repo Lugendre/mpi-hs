@@ -1,0 +1,67 @@
+package(default_visibility = ["//visibility:public"])
+
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_library",
+    "haskell_binary",
+    "haskell_test",
+)
+load(
+    "@rules_haskell//haskell:c2hs.bzl",
+    "c2hs_library",
+    "c2hs_toolchain",
+)
+
+c2hs_toolchain(
+    name = "c2hs",
+    c2hs = "@c2hs//:bin",
+)
+
+cc_library(
+    name = "openmpi.h",
+    srcs = ["@openmpi//:lib"],
+    hdrs = ["@openmpi//:include"],
+    strip_include_prefix = "external/openmpi/include",
+    linkstatic = True,
+)
+
+cc_library(
+    name = "mpi-hs-c",
+    srcs = ["c/src/mpihs.c"],
+    hdrs = ["c/include/mpihs.h"],
+    strip_include_prefix = "c/include",
+    deps = [":openmpi.h"],
+)
+
+c2hs_library(
+    name = "mpi-hs-c2hs",
+    version = "0.7.1.2",
+    src_strip_prefix = "lib",
+    srcs = glob(["lib/**/*.chs"]),
+    deps = [":mpi-hs-c"],
+)
+
+haskell_library(
+    name = "mpi-hs",
+    version = "0.7.1.2",
+    srcs = [
+        "lib/Control/Distributed/MPI/Storable.hs",
+        ":mpi-hs-c2hs"
+    ],
+    deps = [
+        "@stackage//:base",
+        "@stackage//:bytestring",
+        "@stackage//:monad-loops",
+    ],
+)
+
+haskell_binary(
+    name = "mpi-hs-version",
+    version = "0.7.1.2",
+    srcs = ["src/version.hs"],
+    deps = [
+        "@stackage//:base",
+        ":mpi-hs",
+    ],
+)
