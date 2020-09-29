@@ -47,12 +47,13 @@ haskell_library(
     version = "0.7.1.2",
     srcs = [
         "lib/Control/Distributed/MPI/Storable.hs",
-        ":mpi-hs-c2hs"
+        ":mpi-hs-c2hs",
     ],
     deps = [
         "@stackage//:base",
         "@stackage//:bytestring",
         "@stackage//:monad-loops",
+        ":mpi-hs-c",
     ],
 )
 
