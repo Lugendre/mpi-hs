@@ -64,5 +64,7 @@ haskell_binary(
     deps = [
         "@stackage//:base",
         ":mpi-hs",
+        ":mpi-hs-c2hs",
+        ":mpi-hs-c",
     ],
 )
